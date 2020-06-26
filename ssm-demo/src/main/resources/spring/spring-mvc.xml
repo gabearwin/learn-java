@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--配置SpringMVC-->
+    <!--1.开启SpringMVC注解模式
+            (1)自动注册DefaultAnnotationHandlerMapping,AnnotationMethodHandlerAdapter
+            (2)提供一系列功能：数据绑定，数字和日期的format @NumberFormat,@DateTimeFormat,xml/json默认读写支持
+    -->
+    <mvc:annotation-driven/>
+
+    <!--2.静态资源默认servlet配置
+            (1)加入对静态资源的处理，如js，png，gif
+            (2)允许使用"/"做整体映射
+    -->
+    <mvc:default-servlet-handler/>
+
+    <!--3.配置视图解析-->
+    <!--1).配置jsp显示ViewResolver-->
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--这样就可以使用el表达式等-->
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!--所有的页面都在这个路径下-->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!--返回的view都是jsp页面-->
+        <property name="suffix" value=".jsp"/>
+        <property name="order" value="1"/>
+    </bean>
+
+    <!--2).配置FreeMarker环境-->
+    <bean id="freeMarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <!-- freemarker模板位置 -->
+        <property name="templateLoaderPath" value="/WEB-INF/ftl/"/>
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="default_encoding">UTF-8</prop>
+                <prop key="locale">zh_CN</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- FreeMarker视图解析 -->
+    <bean id="ftlViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="contentType" value="text/html;charset=UTF-8"/>
+        <property name="suffix" value=".ftl"/>
+        <!--order值越低，代表优先级越高。配置jsp的InternalResourceViewResolver优先级应该设置为最低，因为它会处理所有的请求。
+        如果把它设置为高优先级，那么有些低优先级的解析器得不到解析。-->
+        <property name="order" value="0"/>
+        <property name="cache" value="false"/>
+    </bean>
+
+    <!--4.扫描web相关的Controller-->
+    <context:component-scan base-package="xyz.gabear.ssm.controller"/>
+
+    <!--json默认是支持的，所以不用配置-->
+
+    <!--5、配置文件上传-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="utf-8"/>
+        <!-- 文件大小最大值 -->
+        <property name="maxUploadSize" value="10485760000"/>
+        <!-- 内存中的最大值 -->
+        <property name="maxInMemorySize" value="40960"/>
+    </bean>
+
+    <!--自定义拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/api/v2/*"/>
+            <bean class="xyz.gabear.learn.ssm.interceptor.ApiInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--配置全局异常捕捉-->
+
+</beans>

@@ -1,0 +1,328 @@
+package xyz.gabear.learn.javase.exercise;
+
+/**
+ * java 反射学习
+ * Created By gabear on 2018/7/23.
+ */
+public class ClassDemo {
+    public static void main(String[] args) {
+
+        Foo foo = new Foo();//生成一个Foo类的实例foo
+
+        // 第一种方式，只知道类名
+        Class c1 = Foo.class;
+        // Class<Foo> c1 = Foo.class;
+
+        // 第二种方式，知道该类的一个对象
+        Class c2 = foo.getClass();
+        // Class<? extends Foo> c2 = foo.getClass();
+
+        System.out.println(c1 == c2);//true
+
+        // 第三种方式，通过类全限定名加载类
+        try {
+            Class c3 = Class.forName("xyz.gabear.controller.Foo");
+            // Class<?> c3 = Class.forName("xyz.gabear.controller.Foo");
+            System.out.println(c2 == c3);//true
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // c1和c2和c3都是Foo的类类型，可以使用类类型创建该类的实例对象
+        try {
+            Foo newFoo = (Foo) c1.newInstance();// 前提要求是该类有无参数的构造方法
+            // Object o = c1.newInstance();
+            newFoo.print();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Foo {
+    void print() {
+        System.out.println("Foo Class.");
+    }
+
+    public static void main(String[] args) {
+        Class c1 = int.class;
+        Class c2 = Integer.class;
+        System.out.println(c1 == c2);// false
+        Class c3 = String.class;
+        Class c4 = void.class;
+        System.out.println(c3.getName());// java.lang.String
+        System.out.println(c3.getSimpleName());// String // 不包含包名的类名称
+    }
+}
+
+/*class Office {
+    public static void main(String[] args) {
+        // 通过new创建对象是静态创建对象，在编译时刻就需要加载所有可能用到的类。
+        // 像下面这种情况，就需要Word和Excel类均存在，有一个不存在编译时就会报错
+        if ("Word".equals(args[0])) {
+            Word word = new Word();
+            word.start();
+        }
+        if ("Excel".equals(args[0])) {
+            Excel excel = new Excel();
+            excel.start();
+        }
+    }
+}*/
+
+
+/*
+interface OfficeAble {
+    void start();
+}
+
+class Word implements OfficeAble {
+    public void start() {
+        System.out.println("Word start...");
+    }
+}
+
+class Excel implements OfficeAble {
+    public void start() {
+        System.out.println("Excel start...");
+    }
+}
+
+class Office {
+    public static void main(String[] args) {
+        try {
+            // 在运行时刻动态加载类
+            Class c = Class.forName(args[0]);
+            // 通过类类型创建该类的对象，强制转换
+            OfficeAble oa = (OfficeAble) c.newInstance();
+            oa.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}*/
+
+/*class ClassUtils {
+    *//**
+     * 打印类的成员函数[getMethods()]
+     *
+     * @param obj
+     *//*
+    public static void printClassMethodMessage(Object obj) {
+        // 获取类信息，首先要获取类的类类型
+        Class c = obj.getClass();// 传递的是哪个子类的对象，c就是该子类的类类型
+        System.out.println("类的名称是：" + c.getName());
+
+        // 一个成员方法就是一个Method对象
+        // getMethods()是获取所有public的方法，包括从父类继承而来的
+        // getDeclaredMethods()是获取该类自己声明的所有方法，不管访问权限
+        Method[] methods = c.getMethods();
+        for (Method method : methods) {
+            // 方法返回值-->返回值类类型
+            Class returnType = method.getReturnType();
+            System.out.print(returnType.getName() + " ");
+            // 方法名字
+            System.out.print(method.getName() + "(");
+            // 方法参数类型-->参数列表的类类型
+            Class[] parameterTypes = method.getParameterTypes();
+            for (Class class1 : parameterTypes) {
+                System.out.print(class1.getName() + ",");
+            }
+            System.out.println(")");
+        }
+    }
+
+    *//**
+     * 打印类的成员变量[getDeclaredFields()]
+     *
+     * @param obj
+     *//*
+    public static void printClassFiledMessage(Object obj) {
+        Class c = obj.getClass();
+
+        // 成员变量也是对象-> java.lang.reflect.Field
+        // filed类封装了关于成员变量的操作
+        // getField()获取的是所有public的变量
+        // getDeclaredFields()获取的是该类自己申明的所有成员变量，不管访问权限(多一些)
+        Field[] fields = c.getDeclaredFields();
+        for (Field field : fields) {
+            // 成员变量的类型-->类类型
+            Class fieldType = field.getType();
+            String fieldTypeName = fieldType.getName();
+            // 成员变量的名称
+            String fieldName = field.getName();
+            System.out.println(fieldTypeName + " " + fieldName);
+        }
+    }
+
+    *//**
+     * 打印类的构造方法[getDeclaredConstructors()]
+     *
+     * @param obj
+     *//*
+    public static void printClassConstructorMessage(Object obj) {
+        Class c = obj.getClass();
+
+        // 构造方法也是对象-> java.lang.reflect.Constructor
+        // getConstructors()获取所有的public的构造方法
+        // getDeclaredConstructors()获取所有的构造方法，包括public和private
+        Constructor[] constructors = c.getDeclaredConstructors();
+        for (Constructor constructor : constructors) {
+            System.out.print(constructor.getName() + "(");
+            // 构造方法的参数
+            Class[] parameterTypes = constructor.getParameterTypes();
+            for (Class class1 : parameterTypes) {
+                System.out.print(class1.getName() + ",");
+            }
+            System.out.println(")");
+        }
+    }
+}*/
+
+/*class MyTest {
+    public static void main(String[] args) {
+        String s = "hello";
+        ClassUtils.printClassMethodMessage(s);
+        ClassUtils.printClassFiledMessage(s);
+        ClassUtils.printClassConstructorMessage(s);
+    }
+}*/
+
+// 方法的名称和方法的参数列表才能唯一确定一个方法
+// 方法的反射操作：method.invoke(对象，参数列表)
+/*class A {
+    public void print() {
+        System.out.println("empty params.");
+    }
+
+    public int print(int a, int b) {
+        return a + b;
+    }
+
+    public void print(String a, String b) {
+        System.out.println(a + " and " + b);
+    }
+}
+
+class MethodInvoke {
+    public static void invokeForA(Object obj) {
+        // 第一步，获取类的类类型
+        Class clazz = obj.getClass();
+        try {
+            // 第二步，获取方法和参数列表
+            // getMethod获取public方法，getDeclaredMethods获取自己申明的方法
+            Method print1 = clazz.getMethod("print");
+            // 第三步，方法的反射操作。使用method操作obj对象，并传入参数
+            print1.invoke(obj);
+            Method print2 = clazz.getMethod("print", int.class, int.class);
+            // 可以像下面这样接收方法的返回值。当没有返回值时，result是null
+            int result = (int) print2.invoke(obj, 10, 20);// 方法返回值result是30
+            System.out.println(result);// 30
+            // 也可以写成下面的形式
+            // Method print2 = clazz.getMethod("print", new Class[]{int.class, int.class});
+            // int result = (int) print2.invoke(obj, new Object[]{10, 20});
+            Method print3 = clazz.getMethod("print", String.class, String.class);
+            String invoke = (String) print3.invoke(obj, "gao", "xiong");// 程序执行这一行会输出"gao and xiong"，但是方法返回值invoke是null
+            System.out.println(invoke);// null
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        A a = new A();
+        invokeForA(a);
+    }
+}*/
+
+// c1==c2为true说明编译之后的泛型是去泛型化的，因为他们编译之后都是一样的。
+// Java中集合的泛型是防止错误输入的，只在编译阶段有效，编译之后就不起作用了。可以在编译之后，通过方法反射对list2插入int型的参数看看是否会报错进行验证。
+// 事实证明list2在编译之后可以插入int型参数不报错。注意现在就不能对list遍历了，因为int型不能强制转换为string，会报错。通过get一个一个取元素或者foreach都不行
+/*class Test {
+    public static void main(String[] args) {
+        ArrayList list1 = new ArrayList();
+        ArrayList<String> list2 = new ArrayList<>();
+        Class c1 = list1.getClass();
+        Class c2 = list2.getClass();
+        System.out.println(c1 == c2);// true
+        list2.add("gabear");
+        // list2.add(100);// 编译会报错，IDEA直接提示参数类型错误
+        try {
+            Method add = c2.getMethod("add", Object.class);
+            add.invoke(list2, 100);
+            System.out.println(list2.size());// 2
+            *//*for (int i = 0; i < list2.size(); i++) {
+                System.out.println(list2.get(i));// 报错
+            }
+            for (String s : list2) {
+                System.out.println(s);// 报错
+            }*//*
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+}*/
+
+/*
+class TestReflect {
+    public static void main(String[] args) throws Exception {
+        int[] temp = {1, 2, 3, 4, 5};
+        Class<?> demo = temp.getClass().getComponentType();
+        System.out.println("数组类型: " + demo.getName());
+        System.out.println("数组长度: " + Array.getLength(temp));
+        System.out.println("数组的第一个元素: " + Array.get(temp, 0));
+        Array.set(temp, 0, 100);
+        System.out.println("修改之后数组第一个元素为: " + Array.get(temp, 0));
+    }
+}
+*/
+
+/* output:
+数组类型: int
+数组长度: 5
+数组的第一个元素: 1
+修改之后数组第一个元素为: 100
+*/
+
+/*class TestReflect {
+    public static void main(String[] args) throws Exception {
+        int[] intArr = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        int[] newIntArr = (int[]) arrayInc(intArr, 15);
+        print(newIntArr);
+        String[] strArr = {"a", "b", "c"};
+        String[] newStrArr = (String[]) arrayInc(strArr, 8);
+        print(newStrArr);
+    }
+
+    // 修改数组大小为len
+    public static Object arrayInc(Object obj, int len) {
+        Class<?> arr = obj.getClass().getComponentType();
+        Object newArr = Array.newInstance(arr, len);
+        int copyLen = Array.getLength(obj);
+        System.arraycopy(obj, 0, newArr, 0, copyLen);
+        return newArr;
+    }
+
+    // 打印数组信息
+    public static void print(Object obj) {
+        Class<?> c = obj.getClass();
+        if (!c.isArray()) {
+            return;
+        }
+        System.out.println("数组长度为: " + Array.getLength(obj));
+        for (int i = 0; i < Array.getLength(obj); i++) {
+            System.out.print(Array.get(obj, i) + " ");
+        }
+        System.out.println();
+    }
+}*/
+
+/* output:
+数组长度为: 15
+1 2 3 4 5 6 7 8 9 0 0 0 0 0 0
+数组长度为: 8
+a b c null null null null null
+*/
+

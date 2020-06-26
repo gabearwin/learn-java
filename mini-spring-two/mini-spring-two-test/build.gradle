@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'xyz.gabear.learn'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(project(':mini-spring-two-framework'))
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        // 指定 jar 包启动主类
+        attributes "Main-Class": "xyz.gabear.spring.Application"
+    }
+    from {
+        // 将深度依赖的 jar 打入到我们 build 的 jar 中
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}

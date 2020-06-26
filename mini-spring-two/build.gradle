@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'xyz.gabear.learn'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+// 给子模块统一配置。子模块可以覆盖这些配置。
+subprojects {
+
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--此配置文件只是一个列子-->
+
+    <!--定义Job方式一：指定任意类和方法，框架会自动反射执行-->
+    <bean id="simpleJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="jobBean"/>
+        <property name="targetMethod" value="printMessage"/>
+    </bean>
+
+    <!--定义Job方式二：继承QuartzJobBean并重写executeInternal方法-->
+    <bean id="complexJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="xyz.gabear.learn.ssm.cron.MyScheduledJob"/>
+        <property name="jobDataMap">
+            <!--这里用map编辑器会报错，可以忽略-->
+            <map>
+                <!--指定成员，利用其set方法完成注入。-->
+                <entry key="DataBean" value-ref="dataBean"/>
+            </map>
+        </property>
+        <!--没有绑定trigger时若想将其加入scheduler，则需指定该项为true-->
+        <property name="Durability" value="true"/>
+    </bean>
+
+    <!--定义Trigger方式一：使用SimpleTrigger，指定开始、结束、频率-->
+    <bean id="mySimpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <!-- 距离当前时间1秒之后执行，之后每隔两秒钟执行一次 -->
+        <property name="jobDetail" ref="simpleJobDetail"/>
+        <property name="startDelay" value="1000"/>
+        <property name="repeatInterval" value="2000"/>
+    </bean>
+
+    <!--定义Trigger方式二：使用CronTrigger，直接用cron表达式-->
+    <bean id="myCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- 每隔5秒钟执行一次 -->
+        <property name="jobDetail" ref="complexJobDetail"/>
+        <property name="cronExpression" value="0/5 * * ? * *"/>
+    </bean>
+
+    <!--将Job和Trigger加入Scheduler-->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <ref bean="simpleJobDetail"/>
+                <ref bean="complexJobDetail"/>
+            </list>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref bean="mySimpleTrigger"/>
+                <ref bean="myCronTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

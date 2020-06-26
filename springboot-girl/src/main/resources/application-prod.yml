@@ -1,0 +1,6 @@
+server:
+  port: 8081
+
+person:
+  name: yan
+  age: 20
