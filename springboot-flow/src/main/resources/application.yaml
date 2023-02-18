@@ -1,0 +1,5 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/myblog?tlsVersion=TLSv1.3%2CTLSv1.2%2CTLSv1.1
+    username: root
+    password: root
